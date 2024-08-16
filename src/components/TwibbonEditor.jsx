@@ -9,7 +9,6 @@ const TwibbonEditor = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [canvasSize, setCanvasSize] = useState({ width: 500, height: 500 });
   const [imageScale, setImageScale] = useState(1);
-
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -68,7 +67,7 @@ const TwibbonEditor = () => {
       const rect = canvasRef.current.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      if (x >= position.x && x <= position.x + image.width && y >= position.y && y <= position.y + image.height) {
+      if (x >= position.x && x <= position.x + canvasSize.width * imageScale && y >= position.y && y <= position.y + canvasSize.height * imageScale) {
         setIsDragging(true);
       }
     }
@@ -83,7 +82,7 @@ const TwibbonEditor = () => {
       const rect = canvasRef.current.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      setPosition({ x: x - image.width / 2, y: y - image.height / 2 });
+      setPosition({ x: x - (canvasSize.width * imageScale) / 2, y: y - (canvasSize.height * imageScale) / 2 });
     }
   };
 
@@ -93,7 +92,7 @@ const TwibbonEditor = () => {
       const touch = e.touches[0];
       const x = touch.clientX - rect.left;
       const y = touch.clientY - rect.top;
-      if (x >= position.x && x <= position.x + image.width && y >= position.y && y <= position.y + image.height) {
+      if (x >= position.x && x <= position.x + canvasSize.width * imageScale && y >= position.y && y <= position.y + canvasSize.height * imageScale) {
         setIsDragging(true);
       }
     }
@@ -105,12 +104,12 @@ const TwibbonEditor = () => {
 
   const handleTouchMove = (e) => {
     if (isDragging) {
+      e.preventDefault(); // Prevent default touch action (scrolling)
       const rect = canvasRef.current.getBoundingClientRect();
       const touch = e.touches[0];
       const x = touch.clientX - rect.left;
       const y = touch.clientY - rect.top;
-      console.log(x);
-      setPosition({ x: x - image.width / 2, y: y - image.height / 2 });
+      setPosition({ x: x - (canvasSize.width * imageScale) / 2, y: y - (canvasSize.height * imageScale) / 2 });
     }
   };
 
@@ -124,6 +123,10 @@ const TwibbonEditor = () => {
 
   const handleImageScaleChange = (event, newValue) => {
     setImageScale(newValue);
+  };
+
+  const handleChange = (event, newValue) => {
+    set(newValue);
   };
 
   return (
@@ -152,6 +155,7 @@ const TwibbonEditor = () => {
             height: canvasSize.height,
             position: "relative",
             margin: "0 auto",
+            touchAction: "none", // Add this line to prevent default touch actions on the canvas
           }}
         >
           <canvas
@@ -167,7 +171,7 @@ const TwibbonEditor = () => {
             style={{ display: "block", width: "100%", height: "100%" }}
           />
         </Box>
-        {twibbon && (
+        {image && (
           <Box mt={2} sx={{ width: "100%" }}>
             <Typography gutterBottom color="primary">
               Atur Ukuran Foto
