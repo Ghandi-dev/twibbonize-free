@@ -8,7 +8,7 @@ const TwibbonEditor = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [canvasSize, setCanvasSize] = useState({ width: 500, height: 500 });
-  const [twibbonScale, setTwibbonScale] = useState(1);
+  const [imageScale, setImageScale] = useState(1);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -17,19 +17,22 @@ const TwibbonEditor = () => {
     const loadImage = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      if (twibbon) {
-        ctx.drawImage(twibbon, position.x, position.y, twibbon.width * twibbonScale, twibbon.height * twibbonScale);
-      }
       if (image) {
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(image, position.x, position.y, canvas.width * imageScale, canvas.height * imageScale);
+      }
+      if (twibbon) {
+        const twibbonWidth = canvasSize.width;
+        const twibbonHeight = (twibbon.height / twibbon.width) * twibbonWidth;
+        const x = (canvasSize.width - twibbonWidth) / 2;
+        const y = (canvasSize.height - twibbonHeight) / 2;
+        ctx.drawImage(twibbon, x, y, twibbonWidth, twibbonHeight);
       }
     };
 
     loadImage();
-  }, [image, twibbon, position, twibbonScale]);
+  }, [image, twibbon, position, imageScale, canvasSize]);
 
   useEffect(() => {
-    // Resize canvas based on screen size
     const updateCanvasSize = () => {
       const width = window.innerWidth > 600 ? 500 : window.innerWidth - 40;
       const height = width;
@@ -51,15 +54,21 @@ const TwibbonEditor = () => {
   const handleTwibbonUpload = (e) => {
     const twib = new Image();
     twib.src = URL.createObjectURL(e.target.files[0]);
-    twib.onload = () => setTwibbon(twib);
+    twib.onload = () => {
+      // Fit twibbon to canvas
+      const twibbonWidth = canvasSize.width;
+      const twibbonHeight = (twib.height / twib.width) * twibbonWidth;
+      setPosition({ x: (canvasSize.width - twibbonWidth) / 2, y: (canvasSize.height - twibbonHeight) / 2 });
+      setTwibbon(twib);
+    };
   };
 
   const handleMouseDown = (e) => {
-    if (twibbon) {
+    if (image) {
       const rect = canvasRef.current.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      if (x >= position.x && x <= position.x + twibbon.width * twibbonScale && y >= position.y && y <= position.y + twibbon.height * twibbonScale) {
+      if (x >= position.x && x <= position.x + image.width && y >= position.y && y <= position.y + image.height) {
         setIsDragging(true);
       }
     }
@@ -74,7 +83,33 @@ const TwibbonEditor = () => {
       const rect = canvasRef.current.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      setPosition({ x: x - (twibbon.width * twibbonScale) / 2, y: y - (twibbon.height * twibbonScale) / 2 });
+      setPosition({ x: x - image.width / 2, y: y - image.height / 2 });
+    }
+  };
+
+  const handleTouchStart = (e) => {
+    if (image) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      const touch = e.touches[0];
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+      if (x >= position.x && x <= position.x + image.width && y >= position.y && y <= position.y + image.height) {
+        setIsDragging(true);
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
+  const handleTouchMove = (e) => {
+    if (isDragging) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      const touch = e.touches[0];
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+      setPosition({ x: x - image.width / 2, y: y - image.height / 2 });
     }
   };
 
@@ -86,8 +121,8 @@ const TwibbonEditor = () => {
     link.click();
   };
 
-  const handleTwibbonScaleChange = (event, newValue) => {
-    setTwibbonScale(newValue);
+  const handleImageScaleChange = (event, newValue) => {
+    setImageScale(newValue);
   };
 
   return (
@@ -97,13 +132,13 @@ const TwibbonEditor = () => {
           <Grid item xs={12} sm={6}>
             <Button variant="contained" component="label" fullWidth sx={{ mb: 2 }}>
               Upload Twibbon
-              <input type="file" accept="image/*" onChange={handleImageUpload} hidden />
+              <input type="file" accept="image/*" onChange={handleTwibbonUpload} hidden />
             </Button>
           </Grid>
           <Grid item xs={12} sm={6}>
             <Button variant="contained" component="label" fullWidth sx={{ mb: 2 }}>
               Upload Foto
-              <input type="file" accept="image/*" onChange={handleTwibbonUpload} hidden />
+              <input type="file" accept="image/*" onChange={handleImageUpload} hidden />
             </Button>
           </Grid>
         </Grid>
@@ -125,6 +160,9 @@ const TwibbonEditor = () => {
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
             onMouseMove={handleMouseMove}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onTouchMove={handleTouchMove}
             style={{ display: "block", width: "100%", height: "100%" }}
           />
         </Box>
@@ -134,12 +172,12 @@ const TwibbonEditor = () => {
               Atur Ukuran Foto
             </Typography>
             <Slider
-              value={twibbonScale}
-              onChange={handleTwibbonScaleChange}
+              value={imageScale}
+              onChange={handleImageScaleChange}
               min={0.1}
               max={2}
               step={0.1}
-              aria-labelledby="twibbon-scale-slider"
+              aria-labelledby="image-scale-slider"
               valueLabelDisplay="auto"
               sx={{ mb: 2 }}
             />
