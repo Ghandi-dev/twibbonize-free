@@ -109,6 +109,7 @@ const TwibbonEditor = () => {
       const touch = e.touches[0];
       const x = touch.clientX - rect.left;
       const y = touch.clientY - rect.top;
+      console.log(x);
       setPosition({ x: x - image.width / 2, y: y - image.height / 2 });
     }
   };
