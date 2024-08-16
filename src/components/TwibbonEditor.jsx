@@ -1,5 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Button, Container, Box, Typography, Grid, Slider } from "@mui/material";
+import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import DownloadIcon from "@mui/icons-material/Download";
+import viteLogo from "/vite.svg";
 
 const TwibbonEditor = () => {
   const canvasRef = useRef(null);
@@ -176,10 +179,13 @@ const TwibbonEditor = () => {
 
   return (
     <Container maxWidth="md">
-      <Box m={4}>
-        <Grid container spacing={2} justifyContent="center">
-          <Grid item xs={12} sm={12} sx={{ textAlign: 'center' }}>
-            <h1>Twibbon</h1>
+      <Box m={2}>
+        <Grid container spacing={1} justifyContent="center">
+          <Grid item xs={12} sm={12} sx={{ textAlign: "center" }}>
+            <Typography gutterBottom variant="h4" sx={{ alignItems: "center", color: "#263238" }}>
+              <img src={viteLogo} alt="Vite Logo" style={{ width: 40, height: 40, marginRight: 2 }} />
+              Twibbon
+            </Typography>
           </Grid>
           <Grid item xs={12} sm={6}>
             <Button variant="contained" component="label" fullWidth sx={{ mb: 2 }}>
@@ -188,7 +194,7 @@ const TwibbonEditor = () => {
             </Button>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Button variant="contained" component="label" fullWidth sx={{ mb: 2 }}>
+            <Button variant="contained" component="label" fullWidth sx={{ mb: 2 }} startIcon={<CameraAltIcon />}>
               Upload Foto
               <input type="file" accept="image/*" onChange={handleImageUpload} hidden />
             </Button>
@@ -228,7 +234,7 @@ const TwibbonEditor = () => {
               value={imageScale}
               onChange={handleImageScaleChange}
               min={0.1}
-              max={10}
+              max={2}
               step={0.1}
               aria-labelledby="image-scale-slider"
               valueLabelDisplay="auto"
@@ -237,8 +243,8 @@ const TwibbonEditor = () => {
           </Box>
         )}
         <Box mt={2} textAlign="center">
-          <Button variant="contained" color="primary" onClick={handleDownload} disabled={!image}>
-            Download Image
+          <Button variant="contained" color="primary" onClick={handleDownload} disabled={!image} startIcon={<DownloadIcon />}>
+            Download
           </Button>
         </Box>
       </Box>
