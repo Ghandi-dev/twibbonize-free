@@ -183,8 +183,7 @@ const TwibbonEditor = () => {
           <Box>
             <SimpleGrid columns={1} mb={4}>
               <Text as="h1" fontSize="2xl" textAlign="center" color="gray.700">
-                <Image src={logo} alt="Logo" boxSize={10} display="inline-block" mr={2} />
-                Twibbon
+                <Image src={logo} alt="Logo" boxSize={20} display="inline-block" mr={2} />
               </Text>
             </SimpleGrid>
             <Grid templateColumns={{ base: "1fr", sm: "1fr 1fr" }} gap={2} justifyContent="center" mb={2}>
@@ -226,7 +225,7 @@ const TwibbonEditor = () => {
               </Box>
             )}
             <Box mt={4} textAlign="center">
-              <Button variant="solid" colorScheme="green" onClick={handleDownload} disabled={!image} leftIcon={<FaDownload />}>
+              <Button variant="solid" colorScheme="green" onClick={handleDownload} isLoading={!image} leftIcon={<FaDownload />}>
                 Download
               </Button>
             </Box>
