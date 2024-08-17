@@ -177,7 +177,7 @@ const TwibbonEditor = () => {
   };
 
   return (
-    <Container maxW="container.md" mt={2} height="calc(100vh - 8rem)">
+    <Container maxW="container.md" mt={2} height="90vh">
       <Card m={2} boxShadow="md">
         <CardBody>
           <Box>
