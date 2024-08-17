@@ -1,8 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Button, Container, Box, Typography, Grid, Slider } from "@mui/material";
-import CameraAltIcon from "@mui/icons-material/CameraAlt";
-import DownloadIcon from "@mui/icons-material/Download";
-import viteLogo from "/vite.svg";
+import { Button, Container, Box, Text, Grid, Slider, SliderTrack, SliderFilledTrack, SliderThumb, Image, SimpleGrid, Card, CardBody } from "@chakra-ui/react";
+import { FaCamera, FaDownload } from "react-icons/fa";
+import logo from "../assets/logo.png"; // Ubah path jika diperlukan
 
 const TwibbonEditor = () => {
   const canvasRef = useRef(null);
@@ -12,7 +11,7 @@ const TwibbonEditor = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [canvasSize, setCanvasSize] = useState({ width: 500, height: 500 });
   const [imageScale, setImageScale] = useState(1);
-  const [originalImageSize, setOriginalImageSize] = useState({ width: 0, height: 0 }); // Tambahkan state ini
+  const [originalImageSize, setOriginalImageSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -40,38 +39,41 @@ const TwibbonEditor = () => {
 
   useEffect(() => {
     const updateCanvasSize = () => {
-      const parent = canvasRef.current.parentNode; // Mengambil parent dari canvas
-      const width = parent.clientWidth; // Mengambil lebar dari parent
-      const height = width; // Menyamakannya dengan lebar agar bentuknya tetap kotak
+      const parent = canvasRef.current.parentNode;
+      const width = parent.clientWidth;
+      const height = width;
       setCanvasSize({ width, height });
     };
 
     window.addEventListener("resize", updateCanvasSize);
-    updateCanvasSize(); // Inisialisasi ukuran canvas pertama kali
+    updateCanvasSize();
 
     return () => window.removeEventListener("resize", updateCanvasSize);
   }, []);
 
   const handleImageUpload = (e) => {
-    const img = new Image();
-    img.src = URL.createObjectURL(e.target.files[0]);
+    const file = e.target.files[0];
+    const imgURL = URL.createObjectURL(file);
+    const img = new window.Image(); // Use window.Image to ensure global context
+    img.src = imgURL;
     img.onload = () => {
-      const scale = canvasSize.width / img.width; // Hitung skala berdasarkan lebar kanvas
-      const scaledHeight = img.height * scale; // Sesuaikan tinggi berdasarkan skala
+      const scale = canvasSize.width / img.width;
+      const scaledHeight = img.height * scale;
 
-      setOriginalImageSize({ width: canvasSize.width, height: scaledHeight }); // Simpan ukuran gambar yang telah disesuaikan
+      setOriginalImageSize({ width: canvasSize.width, height: scaledHeight });
       setImage(img);
-      // Posisi default diatur ke tengah
       setPosition({
-        x: 0, // X diatur ke 0 karena lebar gambar sudah disesuaikan dengan kanvas
-        y: (canvasSize.height - scaledHeight) / 2, // Y diatur agar gambar berada di tengah vertikal
+        x: 0,
+        y: (canvasSize.height - scaledHeight) / 2,
       });
     };
   };
 
   const handleTwibbonUpload = (e) => {
-    const twib = new Image();
-    twib.src = URL.createObjectURL(e.target.files[0]);
+    const file = e.target.files[0];
+    const twibURL = URL.createObjectURL(file);
+    const twib = new window.Image(); // Use window.Image to ensure global context
+    twib.src = twibURL;
     twib.onload = () => {
       setTwibbon(twib);
     };
@@ -129,7 +131,7 @@ const TwibbonEditor = () => {
 
   const handleTouchMove = (e) => {
     if (isDragging) {
-      e.preventDefault();
+      e.preventDefault(); // Make sure to prevent default only if touch is dragging
       const rect = canvasRef.current.getBoundingClientRect();
       const touch = e.touches[0];
       const x = touch.clientX - rect.left;
@@ -142,12 +144,10 @@ const TwibbonEditor = () => {
     const downloadCanvas = document.createElement("canvas");
     const downloadCtx = downloadCanvas.getContext("2d");
 
-    // Set ukuran kanvas untuk unduhan, misalnya 2x dari ukuran normal
     const scaleFactor = 3;
     downloadCanvas.width = canvasSize.width * scaleFactor;
     downloadCanvas.height = canvasSize.height * scaleFactor;
 
-    // Render gambar ke kanvas unduhan dengan ukuran yang lebih besar
     if (image) {
       downloadCtx.drawImage(
         image,
@@ -166,88 +166,73 @@ const TwibbonEditor = () => {
       downloadCtx.drawImage(twibbon, x, y, twibbonWidth, twibbonHeight);
     }
 
-    // Unduh gambar
     const link = document.createElement("a");
     link.href = downloadCanvas.toDataURL("image/png");
     link.download = "twibbon.png";
     link.click();
   };
 
-  const handleImageScaleChange = (event, newValue) => {
-    setImageScale(newValue);
+  const handleImageScaleChange = (value) => {
+    setImageScale(value);
   };
 
   return (
-    <Container maxWidth="md">
-      <Box m={2}>
-        <Grid container spacing={1} justifyContent="center">
-          <Grid item xs={12} sm={12} sx={{ textAlign: "center" }}>
-            <Typography gutterBottom variant="h4" sx={{ alignItems: "center", color: "#263238" }}>
-              <img src={viteLogo} alt="Vite Logo" style={{ width: 40, height: 40, marginRight: 2 }} />
-              Twibbon
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Button variant="contained" component="label" fullWidth sx={{ mb: 2 }}>
-              Upload Twibbon
-              <input type="file" accept="image/*" onChange={handleTwibbonUpload} hidden />
-            </Button>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Button variant="contained" component="label" fullWidth sx={{ mb: 2 }} startIcon={<CameraAltIcon />}>
-              Upload Foto
-              <input type="file" accept="image/*" onChange={handleImageUpload} hidden />
-            </Button>
-          </Grid>
-        </Grid>
+    <Container maxW="container.md" mt={2} height="90vh">
+      <Card m={2} boxShadow="md">
+        <CardBody>
+          <Box>
+            <SimpleGrid columns={1} mb={4}>
+              <Text as="h1" fontSize="2xl" textAlign="center" color="gray.700">
+                <Image src={logo} alt="Logo" boxSize={10} display="inline-block" mr={2} />
+                Twibbon
+              </Text>
+            </SimpleGrid>
+            <Grid templateColumns={{ base: "1fr", sm: "1fr 1fr" }} gap={2} justifyContent="center" mb={2}>
+              <Button variant="solid" colorScheme="teal" size="md" as="label">
+                Upload Twibbon
+                <input type="file" accept="image/*" onChange={handleTwibbonUpload} hidden />
+              </Button>
+              <Button variant="solid" colorScheme="blue" size="md" as="label" leftIcon={<FaCamera />}>
+                Upload Foto
+                <input type="file" accept="image/*" onChange={handleImageUpload} hidden />
+              </Button>
+            </Grid>
 
-        <Box
-          mt={2}
-          sx={{
-            border: "1px solid #ccc",
-            width: window.width,
-            height: window.width,
-            position: "relative",
-            margin: "0 auto",
-            touchAction: "none",
-          }}
-        >
-          <canvas
-            ref={canvasRef}
-            width={canvasSize.width}
-            height={canvasSize.height}
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
-            onMouseMove={handleMouseMove}
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
-            onTouchMove={handleTouchMove}
-            style={{ display: "block", width: "100%", height: "100%" }}
-          />
-        </Box>
-        {image && (
-          <Box mt={2} sx={{ width: "100%" }}>
-            <Typography gutterBottom color="primary">
-              Atur Ukuran Foto
-            </Typography>
-            <Slider
-              value={imageScale}
-              onChange={handleImageScaleChange}
-              min={0.1}
-              max={2}
-              step={0.1}
-              aria-labelledby="image-scale-slider"
-              valueLabelDisplay="auto"
-              sx={{ mb: 2 }}
-            />
+            <Box mt={4} border="1px solid #ccc" width={window.width} height={window.height} position="relative" margin="0 auto" sx={{ touchAction: "none" }}>
+              <canvas
+                ref={canvasRef}
+                width={canvasSize.width}
+                height={canvasSize.height}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+                onMouseMove={handleMouseMove}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+                onTouchMove={handleTouchMove}
+                style={{ display: "block", width: "100%", height: "100%" }}
+              />
+            </Box>
+            {image && (
+              <Box mt={4}>
+                <Text mb={2} color="teal.600">
+                  Atur Ukuran Foto
+                </Text>
+                <Slider value={imageScale} onChange={handleImageScaleChange} min={0.1} max={2} step={0.1} aria-label="image-scale-slider">
+                  <SliderTrack>
+                    <SliderFilledTrack />
+                  </SliderTrack>
+                  <SliderThumb />
+                </Slider>
+              </Box>
+            )}
+            <Box mt={4} textAlign="center">
+              <Button variant="solid" colorScheme="green" onClick={handleDownload} disabled={!image} leftIcon={<FaDownload />}>
+                Download
+              </Button>
+            </Box>
           </Box>
-        )}
-        <Box mt={2} textAlign="center">
-          <Button variant="contained" color="primary" onClick={handleDownload} disabled={!image} startIcon={<DownloadIcon />}>
-            Download
-          </Button>
-        </Box>
-      </Box>
+        </CardBody>
+      </Card>
     </Container>
   );
 };

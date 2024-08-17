@@ -1,12 +1,17 @@
 import React from "react";
-import TwibbonEditor from "./components/TwibbonEditor.jsx";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Create from "./pages/Create.jsx";
+import Home from "./pages/Home.jsx";
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <TwibbonEditor />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/create" element={<Create />} />
+      </Routes>
+    </BrowserRouter>
   );
-}
+};
 
 export default App;
