@@ -1,8 +1,10 @@
 import React from "react";
 import { Box, Flex, Heading, Image } from "@chakra-ui/react";
 import logo from "../assets/logo.png"; // Updated path to logo.png
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
+  const navigate = useNavigate();
   return (
     <Box
       bg="blue.500"
@@ -11,7 +13,7 @@ const Header = () => {
       position="relative"
     >
       <Flex h={16} alignItems="center" justifyContent="space-between" maxWidth="container.xl" mx="auto">
-        <Flex alignItems="center">
+        <Flex alignItems="center" onClick={() => navigate("/")}>
           <Image src={logo} alt="Logo" boxSize={10} mr={2} />
           <Heading as="h5" size="md" color="white">
             SttTwib

@@ -8,11 +8,14 @@ const Footer = () => {
     <Box
       bg="#333"
       color="white"
-      p={4}
-      width="100%" // Ensure the header takes up full width
+      height="4rem"
+      width="100%"
+      display="flex"
+      alignItems="center" // Center content vertically
+      justifyContent="center" // Center content horizontally
       position="relative"
       textAlign="center"
-      zIndex={1000} // Ensure it stays on top of other content
+      zIndex={1000}
     >
       <Text fontSize="sm">© {currentYear} Ghandi & Sekolah Tinggi Wastukancana</Text>
     </Box>

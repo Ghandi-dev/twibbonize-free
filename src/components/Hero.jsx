@@ -11,9 +11,8 @@ const Hero = () => {
       flexDirection="column"
       alignItems="center"
       justifyContent="center"
-      height="90vh"
-      //   backgroundImage="url('/src/assets/logo.png')"
-      bgGradient={"linear(to-t, blue.200, teal.500)"}
+      height="calc(100vh - 8rem)" // Adjust 80px to the combined height of header and footer
+      bgGradient="linear(to-t, blue.200, teal.500)"
       backgroundSize="cover"
       backgroundPosition="center"
       textAlign="center"
